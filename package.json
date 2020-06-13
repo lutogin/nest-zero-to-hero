@@ -1,0 +1,11 @@
+{
+  "name": "nestjs-zero-to-hero",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "docker-compose -f docker-compose.yml up"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

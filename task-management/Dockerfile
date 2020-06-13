@@ -1,0 +1,6 @@
+FROM node:14-alpine
+WORKDIR /app
+
+COPY ./ /app
+
+CMD yarn start:debug:ide

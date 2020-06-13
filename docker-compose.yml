@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  task-management:
+    container_name: zero-hero.task-management
+    build:
+      context: ./task-management
+      dockerfile: Dockerfile
+    volumes:
+    - ./task-management:/app
+    - /app/node_modules
+    depends_on:
+      - postgres
+    ports:
+      - 3000:3000
+      - 9229:9229
+
+  postgres:
+    image: postgres:12.0-alpine
+    container_name: zero-hero.postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: 1123
+      POSTGRES_DB: tasks
+
+volumes:
+  postgres:
