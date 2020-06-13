@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { GetTaskFilteredDto } from './dto/get-task-filtered.dto';
 import { Task, TaskStatus } from './interfaces/task.interface';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -16,8 +15,12 @@ export class TasksService {
     return this.tasks;
   }
 
-  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-    const { title, description } = createTaskDto;
+  async getTaskByFilter(status: TaskStatus): Promise<Task[]> {
+    return this.tasks.filter(task => task.status === status);
+  }
+
+  async createTask(taskData: Task): Promise<Task> {
+    const { title, description } = taskData;
     const newTaskData = {
       id: uuidv4(),
       title,
@@ -30,9 +33,10 @@ export class TasksService {
     return newTaskData;
   }
 
-  async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
+  async updateTask(id: string, taskData: Task): Promise<Task> {
+    const { title, description, status } = taskData;
     const index = this.tasks.findIndex(task => task.id === id);
-    const { title, description, status } = updateTaskDto;
+
     return this.tasks[index] = {
       id,
       title: title || this.tasks[index].title,

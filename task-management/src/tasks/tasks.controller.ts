@@ -1,7 +1,7 @@
 import {Body, Controller, Delete, Get, Param, Patch, Post, UsePipes, ValidationPipe} from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { Task } from './interfaces/task.interface';
+import {Task, TaskStatus} from './interfaces/task.interface';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')
@@ -18,8 +18,14 @@ export class TasksController{
     return this.tasksService.getTaskById(id);
   }
 
+  @Get('/status/:status')
+  async getTaskByStatus(@Param('status') status: TaskStatus) {
+    return this.tasksService.getTaskByFilter(status);
+  }
+
   @Post()
   async crateTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
+
     return this.tasksService.createTask(createTaskDto);
   }
 
