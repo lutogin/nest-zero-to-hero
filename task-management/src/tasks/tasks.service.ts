@@ -1,55 +1,52 @@
-import { Injectable } from '@nestjs/common';
-import { GetTaskFilteredDto } from './dto/get-task-filtered.dto';
-import { Task, TaskStatus } from './interfaces/task.interface';
-import { v4 as uuidv4 } from 'uuid';
+import {Injectable, NotFoundException} from '@nestjs/common';
+import {CreateTaskDto} from './dto/create-task.dto';
+import { Task } from './task.entity';
+import { TaskStatus } from './task-status.enum';
+import { TaskRepository } from './task.repository';
 
 @Injectable()
 export class TasksService {
-  private tasks: Task[] = [];
+  constructor(private taskRepository: TaskRepository) {}
 
   async getTaskById(id: string): Promise<Task> {
-    return this.tasks.find(task => task.id === id);
+    const task = this.taskRepository.findOne({ id });
+
+    if(!task) {
+      throw new NotFoundException(`Task with id ${id} not found.`)
+    }
+
+    return task;
   }
 
   async getAllTasks(): Promise<Task[]> {
-    return this.tasks;
+    return this.taskRepository.find({});
   }
 
   async getTaskByFilter(status: TaskStatus): Promise<Task[]> {
-    return this.tasks.filter(task => task.status === status);
+    return this.taskRepository.find({ status });
   }
 
-  async createTask(taskData: Task): Promise<Task> {
-    const { title, description } = taskData;
-    const newTaskData = {
-      id: uuidv4(),
-      title,
-      description,
-      status: TaskStatus.OPEN,
-    };
-
-    this.tasks.push(newTaskData);
-
-    return newTaskData;
+  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+    return this.taskRepository.createTask(createTaskDto);
   }
-
-  async updateTask(id: string, taskData: Task): Promise<Task> {
-    const { title, description, status } = taskData;
-    const index = this.tasks.findIndex(task => task.id === id);
-
-    return this.tasks[index] = {
-      id,
-      title: title || this.tasks[index].title,
-      description: description || this.tasks[index].description,
-      status: status || this.tasks[index].status,
-    };
-  }
-
-  async deleteTask(id: string): Promise<Task> {
-    const deletedTaskIndex = this.tasks.findIndex(task => task.id === id);
-    const deletedTaskData = this.tasks.splice(deletedTaskIndex, 1);
-
-    return deletedTaskData[0];
-  }
+  //
+  // async updateTask(id: string, taskData: Task): Promise<Task> {
+  //   const { title, description, status } = taskData;
+  //   const index = this.tasks.findIndex(task => task.id === id);
+  //
+  //   return this.tasks[index] = {
+  //     id,
+  //     title: title || this.tasks[index].title,
+  //     description: description || this.tasks[index].description,
+  //     status: status || this.tasks[index].status,
+  //   };
+  // }
+  //
+  // async deleteTask(id: string): Promise<Task> {
+  //   const deletedTaskIndex = this.tasks.findIndex(task => task.id === id);
+  //   const deletedTaskData = this.tasks.splice(deletedTaskIndex, 1);
+  //
+  //   return deletedTaskData[0];
+  // }
 
 }

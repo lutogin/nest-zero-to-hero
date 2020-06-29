@@ -16,11 +16,30 @@ services:
       - task-management/.env
     depends_on:
       - postgresdb
+#      - auth-service
     ports:
       - 3000:3000
       - 9229:9229
     networks:
       - net
+
+#  auth-service:
+#    container_name: zero-hero.auth-service
+#    build:
+#      context: ./auth-service
+#      dockerfile: Dockerfile
+#    volumes:
+#      - ./auth-service:/app
+#      - /app/node_modules
+#    env_file:
+#      - auth-service/.env
+#    depends_on:
+#      - postgresdb
+#    ports:
+#      - 5000:5000
+#      - 9230:9230
+#    networks:
+#      - net
 
   postgresdb:
     image: postgres:12.0-alpine

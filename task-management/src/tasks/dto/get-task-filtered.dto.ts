@@ -1,8 +1,6 @@
 import { isNotEmpty, isString } from 'class-validator';
-import { TaskStatus } from '../interfaces/task.interface';
+import { TaskStatus } from '../task-status.enum';
 
 export class GetTaskFilteredDto {
-  @isNotEmpty()
-  @isString()
-  status: TaskStatus
+  readonly status: TaskStatus
 }
