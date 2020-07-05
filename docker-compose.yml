@@ -5,7 +5,7 @@ networks:
 
 services:
   task-management:
-    container_name: zero-hero.task-management
+    container_name: zero-hero.task-management-service
     build:
       context: ./task-management
       dockerfile: Dockerfile
@@ -15,43 +15,43 @@ services:
     env_file:
       - task-management/.env
     depends_on:
-      - postgresdb
-#      - auth-service
+      - postgres-db
+      - auth-service
     ports:
-      - 3000:3000
+      - 34000:3000
       - 9229:9229
     networks:
       - net
 
-#  auth-service:
-#    container_name: zero-hero.auth-service
-#    build:
-#      context: ./auth-service
-#      dockerfile: Dockerfile
-#    volumes:
-#      - ./auth-service:/app
-#      - /app/node_modules
-#    env_file:
-#      - auth-service/.env
-#    depends_on:
-#      - postgresdb
-#    ports:
-#      - 5000:5000
-#      - 9230:9230
-#    networks:
-#      - net
-
-  postgresdb:
-    image: postgres:12.0-alpine
-    container_name: zero-hero.postgres
+  auth-service:
+    container_name: zero-hero.auth-service
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    volumes:
+      - ./auth-service:/app
+      - /app/node_modules
+    env_file:
+      - auth-service/.env
+    depends_on:
+      - postgres-db
     ports:
-      - 5432:5432
+      - 34001:3000
+      - 9230:9230
+    networks:
+      - net
+
+  postgres-db:
+    image: postgres:12.0-alpine
+    container_name: zero-hero.app-db
+    ports:
+      - 50432:5432
     volumes:
       - postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: 1123
-      POSTGRES_DB: tasks
+      POSTGRES_DB: app-db
     networks:
       - net
 

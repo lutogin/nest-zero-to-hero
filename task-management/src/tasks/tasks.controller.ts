@@ -12,8 +12,6 @@ import { Task } from './task.entity';
 @Controller('tasks')
 export class TasksController{
   constructor(
-    @InjectRepository(TaskRepository)
-    private taskRepository: TaskRepository,
     private tasksService: TasksService,
   ) {}
 
