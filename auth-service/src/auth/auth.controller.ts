@@ -8,10 +8,10 @@ export class AuthController {
     private usersService: UsersService
   ) {}
 
-  @Get('/signup')
-  async signUp(
+  @Get('/register')
+  async register(
     @Body() signUpCredentials: SignUpCredentials
   ) {
-    return this.usersService.signUp(signUpCredentials);
+    return this.usersService.register(signUpCredentials);
   }
 }

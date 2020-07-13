@@ -12,7 +12,7 @@ export class UsersService {
     private userRepository: UserRepository
   ) {}
 
-  async signUp(signUpCredentials: SignUpCredentials) {
+  async register(signUpCredentials: SignUpCredentials) {
     return this.userRepository.signUp(signUpCredentials);
   }
 

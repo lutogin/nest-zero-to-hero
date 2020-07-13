@@ -3,4 +3,4 @@ WORKDIR /app
 
 COPY ./ /app
 
-CMD yarn build && yarn start:debug
+CMD yarn && yarn start:debug
