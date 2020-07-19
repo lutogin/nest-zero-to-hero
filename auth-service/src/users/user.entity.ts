@@ -1,7 +1,9 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { PasswordService } from '../services/password-service';
 import { UserRole } from './user.role.enum';
 
 @Entity({ name: 'Users' })
+@Unique(['email'])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid', { name: 'id' })
   id: string;
@@ -32,4 +34,9 @@ export class User extends BaseEntity {
 
   @Column({ type: 'timestamp', name: 'register_at', default: 'now()' })
   registerAt: number;
+
+
+  async validatePassword(plainPassword: string): Promise<boolean> {
+    return PasswordService.compare(plainPassword, this.passwordHash);
+  }
 }

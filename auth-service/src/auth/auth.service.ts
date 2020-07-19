@@ -1,30 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AuthCredentials } from './dto/auth.credentials';
+import { UserRepository } from '../users/user.repository';
+import { AccessToken } from './interfaces/access-token.interface';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    @InjectRepository(UserRepository)
+    private userRepository: UserRepository,
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.getUser({ email });
-    if (user && user.passwordHash === password) {
-      const { passwordHash, ...userFields } = user;
-
-      return userFields;
-    }
-
-    return null;
+  async signUp(authCredentials: AuthCredentials): Promise<any> {
+    return this.userRepository.signUp(authCredentials);
   }
 
-  async login(user: any) {
-    const payload = { username: user.username, sub: user.userId };
+  async signIn(authCredentials: AuthCredentials): Promise<AccessToken> {
+    const user = await this.userRepository.getUserByCredentials(authCredentials);
+
+    if(!user) {
+      throw new UnauthorizedException('Invalid credentials.');
+    }
+
+    const { id, email, role } = user;
+    const payload: JwtPayload = { id, email, role };
+
     return {
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      access_token: this.jwtService.sign(payload),
-    };
+      accessToken: await this.jwtService.signAsync(payload),
+    }
   }
 }

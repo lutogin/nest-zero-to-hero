@@ -1,22 +1,41 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { ConflictException, InternalServerErrorException } from '@nestjs/common';
+import { EntityRepository, getRepository, Repository } from 'typeorm';
 import { PasswordService } from '../services/password-service';
 import { GetUserFilterDto } from './dto/get-user-filter.dto';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
-import { SignUpCredentials } from './dto/sign-up.credentials';
+import { AuthCredentials } from '../auth/dto/auth.credentials';
 import { User } from './user.entity';
-import { UserRole } from './user.role.enum';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-  async signUp(signUpCredentials: SignUpCredentials): Promise<void> {
-    const { email, password, role } = signUpCredentials;
+  private static DUPLICATE_ERROR_CODE = '23505';
+
+  async signUp(authCredentials: AuthCredentials): Promise<void> {
+    const { email, password } = authCredentials;
 
     const user = new User();
     user.email = email;
     user.passwordHash = await PasswordService.hash(password);
-    user.role = role || UserRole.USER;
+    try {
+      await user.save();
+    } catch (err) {
+      if (err.code === UserRepository.DUPLICATE_ERROR_CODE) {
+        throw new ConflictException('Email already exists.')
+      }
 
-    await user.save();
+      throw new InternalServerErrorException(err);
+    }
+  }
+
+  async getUserByCredentials(signUpCredentials: AuthCredentials): Promise<User> {
+    const { email, password } = signUpCredentials;
+    // const user = await User.findOne({ email });
+    const user = await getRepository(User).findOne({email});
+    if (user && await user.validatePassword(password)) {
+      return user
+    }
+
+    return null;
   }
 
   async getUsers(getUserFilter: GetUsersFilterDto): Promise<User[]> {

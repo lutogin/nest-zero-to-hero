@@ -1,17 +1,33 @@
-import { Body, Controller, Get } from '@nestjs/common';
-import { SignUpCredentials } from '../users/dto/sign-up.credentials';
-import { UsersService } from '../users/users.service';
+import { Body, Controller, Post, Req, UseGuards, ValidationPipe } from '@nestjs/common';
+import { AuthCredentials } from './dto/auth.credentials';
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './JWT-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private usersService: UsersService
+    private authService: AuthService,
   ) {}
 
-  @Get('/register')
-  async register(
-    @Body() signUpCredentials: SignUpCredentials
-  ) {
-    return this.usersService.register(signUpCredentials);
+  @Post('/signup')
+  async signUp(
+    @Body(ValidationPipe) authCredentials: AuthCredentials
+  ): Promise<void> {
+    return this.authService.signUp(authCredentials);
+  }
+
+  @Post('/signin')
+  async signIn(
+    @Body(ValidationPipe) authCredentials: AuthCredentials
+  ): Promise<any> {
+    return this.authService.signIn(authCredentials);
+  }
+
+  @Post('/test')
+  @UseGuards(JwtAuthGuard)
+  test(@Req() req) {
+    const { passwordHash, ...user } = req.user;
+
+    return user;
   }
 }

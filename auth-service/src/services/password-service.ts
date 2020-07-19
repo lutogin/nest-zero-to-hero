@@ -1,28 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
+import { SECRET } from '../../config/module.config';
 
 @Injectable()
 export class PasswordService {
-  private static SALT_ROUNDS = 10;
-
-  static hash(plainPassword: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      bcrypt.hash(plainPassword, PasswordService.SALT_ROUNDS, (error, theHash) => {
-        if (error) return reject(error);
-
-        return resolve(theHash);
-      });
-    });
+  static async hash(plainPassword: string): Promise<string> {
+    return bcrypt.hash(plainPassword, SECRET);
   }
 
-  static async compare (plainPassword, theHash): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      bcrypt.compare(plainPassword, theHash, (error, result) => {
-        if (error) return reject(error);
-
-        return resolve(result);
-      });
-    });
+  static async compare (plainPassword, hash): Promise<boolean> {
+    return bcrypt.compare(plainPassword, hash);
   }
 
   static async generate(passwordLength = 12): Promise<string> {
