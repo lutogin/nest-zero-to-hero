@@ -3,15 +3,13 @@ import * as dotEnv from 'dotenv';
 dotEnv.config();
 
 const {
-  DATABASE_URL,
-  SALT,
-  SECRET,
+  AUTH_SERVICE_HOST,
+  AUTH_SERVICE_PORT,
   PORT,
 } = process.env;
 
 export {
-  DATABASE_URL,
-  SALT,
-  SECRET,
-  PORT,
+  AUTH_SERVICE_PORT,
+  AUTH_SERVICE_HOST,
+  PORT
 }

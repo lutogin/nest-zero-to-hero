@@ -4,19 +4,20 @@ networks:
   net:
 
 services:
-  task-management:
-    container_name: zero-hero.task-management-service
+  edge:
+    container_name: zero-hero.edge-service
     build:
-      context: ./task-management
+      context: ./edge
       dockerfile: Dockerfile
     volumes:
-      - ./task-management:/app
+      - ./edge:/app
       - /app/node_modules
     env_file:
-      - task-management/.env
+      - edge/.env
     depends_on:
       - postgres-db
       - auth-service
+      - task-management
     ports:
       - 34000:3000
       - 9230:9230
@@ -38,6 +39,25 @@ services:
     ports:
       - 34001:3000
       - 9231:9231
+    networks:
+      - net
+
+  task-management:
+    container_name: zero-hero.task-management-service
+    build:
+      context: ./task-management
+      dockerfile: Dockerfile
+    volumes:
+      - ./task-management:/app
+      - /app/node_modules
+    env_file:
+      - task-management/.env
+    depends_on:
+      - postgres-db
+      - auth-service
+    ports:
+      - 34002:3000
+      - 9232:9232
     networks:
       - net
 
