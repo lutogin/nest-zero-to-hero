@@ -1,22 +1,18 @@
-import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_SERVICE_HOST, AUTH_SERVICE_PORT } from '../config/module.config';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthenticationMiddleware } from './authentication.middleware';
 
 @Module({
-  imports: [
-    ClientsModule.register([
-      {
-        name: 'AUTH_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          host: AUTH_SERVICE_HOST,
-          port: +AUTH_SERVICE_PORT,
-        },
-      },
-    ])
-  ],
+  imports: [],
   controllers: [AppController],
-  providers: [],
+  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): MiddlewareConsumer | void {
+    consumer.apply(AuthenticationMiddleware)
+      .forRoutes({
+        method: RequestMethod.GET, path: '/tasks'
+      })
+  }
+}

@@ -1,5 +1,4 @@
 import { Body, Controller, Post, Req, UseGuards, ValidationPipe } from '@nestjs/common';
-import { EventPattern, MessagePattern } from '@nestjs/microservices';
 import { AuthCredentials } from './dto/auth.credentials';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './JWT-auth.guard';
@@ -30,12 +29,5 @@ export class AuthController {
     const { passwordHash, ...user } = req.user;
 
     return user;
-  }
-
-  @Post('/test')
-  @MessagePattern({ meta: 'test' })
-  test(msg) {
-    console.log('msg ---> ', msg);
-    return msg;
   }
 }

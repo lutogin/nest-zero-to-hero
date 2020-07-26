@@ -1,20 +1,14 @@
-import { Controller, Get, Inject } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { Controller, Get, Req } from '@nestjs/common';
+import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
   constructor(
-    @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy
+    private services: AppService
   ) {}
 
-  async onApplicationBootstrap() {
-    await this.authClient.connect();
-  }
-
-  @Get()
-  test(): Observable<string> {
-    const pattern = { meta: 'test'};
-    return this.authClient.send<any>(pattern, 'HELLO FROM EDGE');
+  @Get('/tasks')
+  async getTasksList(@Req() req) {
+    return this.services.getTasksList();
   }
 }
