@@ -1,4 +1,4 @@
-import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, Matches, MinLength } from 'class-validator';
+import { IsEmail, IsOptional, IsString, Matches, MinLength } from 'class-validator';
 import { UserRole } from '../../users/user.role.enum';
 
 export class AuthCredentials {
@@ -11,4 +11,8 @@ export class AuthCredentials {
     { message: 'Password to weak.' }
   )
   password: string;
+
+  @IsOptional()
+  @IsString()
+  name?: string;
 }

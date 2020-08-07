@@ -14,8 +14,18 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  async makeToken({ id, email, role }) {
+    const payload: JwtPayload = { id, email, role };
+
+    return this.jwtService.signAsync(payload);
+  }
+
   async signUp(authCredentials: AuthCredentials): Promise<any> {
-    return this.userRepository.signUp(authCredentials);
+    const signUpUser = await this.userRepository.signUp(authCredentials);
+    return {
+      signUpUser,
+      accessToken: await this.makeToken(signUpUser),
+    }
   }
 
   async signIn(authCredentials: AuthCredentials): Promise<AccessToken> {
@@ -25,11 +35,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials.');
     }
 
-    const { id, email, role } = user;
-    const payload: JwtPayload = { id, email, role };
-
     return {
-      accessToken: await this.jwtService.signAsync(payload),
+      accessToken: await this.makeToken(user),
     }
   }
 }

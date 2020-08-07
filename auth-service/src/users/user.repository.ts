@@ -10,14 +10,17 @@ import { User } from './user.entity';
 export class UserRepository extends Repository<User> {
   private static DUPLICATE_ERROR_CODE = '23505';
 
-  async signUp(authCredentials: AuthCredentials): Promise<void> {
-    const { email, password } = authCredentials;
+  async signUp(authCredentials: AuthCredentials): Promise<any> {
+    const { email, password, name } = authCredentials;
 
     const user = new User();
     user.email = email;
     user.passwordHash = await PasswordService.hash(password);
+    user.name = name ? name : null;
     try {
       await user.save();
+      const { passwordHash, ...userData } = user;
+      return userData;
     } catch (err) {
       if (err.code === UserRepository.DUPLICATE_ERROR_CODE) {
         throw new ConflictException('Email already exists.')
