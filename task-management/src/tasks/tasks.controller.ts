@@ -1,10 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { DeleteResult } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTaskFilteredDto } from './dto/get-task-filtered.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
 import { Task } from './task.entity';
+import { get } from 'lodash';
 
 @Controller('tasks')
 export class TasksController{
@@ -23,8 +25,15 @@ export class TasksController{
   }
 
   @Post('/')
-  async crateTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
-    return this.tasksService.createTask(createTaskDto);
+  async crateTask(
+    @Req()
+    req: Request,
+    @Body()
+    createTaskDto: CreateTaskDto
+  ): Promise<Task> {
+    const { user } = req;
+    console.log('user ---> ', user); // TODO
+    return this.tasksService.createTask({ ...createTaskDto, userId: get(user, 'id') });
   }
 
   @Patch('/:id')
