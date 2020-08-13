@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
+import { GetUser } from '../decorators/get-user.decorator';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskInterface } from './interfeces/task.interface';
@@ -10,7 +11,7 @@ export class TasksController {
     private tasksService: TasksService
   ) {}
 
-  @Get('/')
+  @Get()
   async getTasks(): Promise<TaskInterface[]> {
     return this.tasksService.getTasks();
   }
@@ -20,9 +21,13 @@ export class TasksController {
     return this.tasksService.getTaskById(id);
   }
 
-  @Post('/')
-  async crateTask(@Body() createTaskDto: CreateTaskDto): Promise<TaskInterface> {
-    return this.tasksService.createTask(createTaskDto);
+  @Post()
+  async crateTask(
+    @GetUser()
+    user,
+    @Body() createTaskDto: CreateTaskDto
+  ): Promise<TaskInterface> {
+    return this.tasksService.createTask(createTaskDto); // todo send user
   }
 
   @Patch('/:id')

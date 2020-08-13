@@ -1,7 +1,9 @@
-import { createParamDecorator } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { get } from 'lodash';
-import { User } from '../interfaces/user.interface';
 
-export const GetUser = createParamDecorator((data, req): User => {
-  return get(req, 'user', '');
-});
+export const GetUser = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    return get(request, 'user');
+  },
+);
