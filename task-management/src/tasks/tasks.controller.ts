@@ -1,12 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common';
-import { Request } from 'express';
 import { DeleteResult } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTaskFilteredDto } from './dto/get-task-filtered.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
 import { Task } from './task.entity';
-import { get } from 'lodash';
 
 @Controller('tasks')
 export class TasksController{
@@ -14,38 +12,43 @@ export class TasksController{
     private tasksService: TasksService,
   ) {}
 
-  @Get('/')
-  async getTasks(@Query() filterDto: GetTaskFilteredDto): Promise<Task[]> {
-    return this.tasksService.getTasks(filterDto);
+  @Get('/user/:userId')
+  async getTasks(
+    @Query('userId') userId: string,
+    @Query() filterDto: GetTaskFilteredDto,
+  ): Promise<Task[]> {
+    return this.tasksService.getTasks(userId, filterDto);
   }
 
-  @Get('/:id')
-  async getTaskById(@Param('id') id: string): Promise<Task> {
-    return this.tasksService.getTaskById(id);
+  @Get('/:id/user/:userId')
+  async getTaskById(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+  ): Promise<Task> {
+    return this.tasksService.getTaskById(id, userId);
   }
 
   @Post('/')
   async crateTask(
-    @Req()
-    req: Request,
-    @Body()
-    createTaskDto: CreateTaskDto
+    @Body() createTaskDto: CreateTaskDto
   ): Promise<Task> {
-    const { user } = req;
-    console.log('user ---> ', user); // TODO
-    return this.tasksService.createTask({ ...createTaskDto, userId: get(user, 'id') });
+    return this.tasksService.createTask(createTaskDto);
   }
 
-  @Patch('/:id')
+  @Patch('/:id/user/:userId')
   async updateTask(
     @Param('id') id: string,
+    @Param('userId') userId: string,
     @Body() updateTaskDto: UpdateTaskDto,
   ): Promise<Task> {
-    return this.tasksService.updateTask(id, updateTaskDto);
+    return this.tasksService.updateTask(id, userId, updateTaskDto);
   }
 
-  @Delete('/:id')
-  async deleteTask(@Param('id') id: string): Promise<DeleteResult> {
-    return this.tasksService.deleteTask(id);
+  @Delete('/:id/user/:userId')
+  async deleteTask(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+  ): Promise<DeleteResult> {
+    return this.tasksService.deleteTask(id, userId);
   }
 }

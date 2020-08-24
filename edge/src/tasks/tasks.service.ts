@@ -14,32 +14,32 @@ export class TasksService {
     })
   }
 
-  async getTasks(): Promise<TaskInterface[]> {
-    const { data } = await this.taskClient.get('/tasks');
+  async getTasks(userId: string): Promise<TaskInterface[]> {
+    const { data } = await this.taskClient.get(`/tasks/user/${userId}`);
 
     return data;
   }
 
-  async getTaskById(id: string): Promise<TaskInterface> {
-    const { data } = await this.taskClient.get(`/tasks/${id}`);
+  async getTaskById(id: string, userId: string): Promise<TaskInterface> {
+    const { data } = await this.taskClient.get(`/tasks/${id}/user/${userId}`);
 
     return data;
   }
 
-  async createTask(createTaskDto: CreateTaskDto): Promise<TaskInterface> {
-    const { data } = await this.taskClient.post('/tasks', createTaskDto);
+  async createTask(createTaskDto: CreateTaskDto, userId: string): Promise<TaskInterface> {
+    const { data } = await this.taskClient.post('/tasks', { ...createTaskDto, userId});
 
     return data;
   }
 
-  async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<TaskInterface> {
-    const { data } = await this.taskClient.patch(`/tasks/${id}`, updateTaskDto);
+  async updateTask(id: string, userId: string, updateTaskDto: UpdateTaskDto): Promise<TaskInterface> {
+    const { data } = await this.taskClient.patch(`/tasks/${id}/user/${userId}`, updateTaskDto);
 
     return data;
   }
 
-  async deleteTask(id): Promise<any> {
-    const { data } = await this.taskClient.delete(`/tasks/${id}`);
+  async deleteTask(id, userId): Promise<any> {
+    const { data } = await this.taskClient.delete(`/tasks/${id}/user/${userId}`);
 
     return data;
   }

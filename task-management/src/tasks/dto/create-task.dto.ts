@@ -9,5 +9,7 @@ export class CreateTaskDto {
   @IsString()
   readonly description: string;
 
+  @IsNotEmpty()
+  @IsString()
   readonly userId?: string;
 }

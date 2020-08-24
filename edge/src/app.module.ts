@@ -18,6 +18,8 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): MiddlewareConsumer | void {
     consumer.apply(AuthenticationMiddleware)
       .forRoutes(
+        { method: RequestMethod.GET, path: '/tasks/:id' },
+        { method: RequestMethod.GET, path: '/tasks' },
         { method: RequestMethod.POST, path: '/tasks' },
         { method: RequestMethod.PATCH, path: '/tasks/:id' },
         { method: RequestMethod.DELETE, path: '/tasks/:id' },
